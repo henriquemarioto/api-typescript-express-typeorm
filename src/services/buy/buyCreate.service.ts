@@ -12,7 +12,7 @@ const buyCreateService = async (userEmail: string) => {
   const user = await userRepository.findOne({
     where: { email: userEmail },
   });
-
+  
   if (!user) {
     throw new AppError(404, "User not found");
   }
@@ -31,7 +31,6 @@ const buyCreateService = async (userEmail: string) => {
     buy.products = cart.products;
     buy.total = cart.subtotal;
 
-    
     buyRepository.create(buy);
     await buyRepository.save(buy);
 

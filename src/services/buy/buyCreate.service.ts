@@ -26,7 +26,7 @@ const buyCreateService = async (userEmail: string) => {
       throw new AppError(400, "Cart is empty");
     }
 
-    const buy = new Bwuy();
+    const buy = new Buy();
     buy.user = user;
     buy.products = cart.products;
     buy.total = cart.subtotal;

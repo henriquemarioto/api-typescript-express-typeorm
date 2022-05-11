@@ -12,6 +12,6 @@ appRoutes(app)
 
 app.use(errorHandlingMiddleware)
 
-// app.listen(3000, () => {console.log("App running at port 3000")})
+//app.listen(3000, () => {console.log("App running at port 3000")})
 
 export default app

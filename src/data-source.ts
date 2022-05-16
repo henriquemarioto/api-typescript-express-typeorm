@@ -6,7 +6,7 @@ export const AppDataSource =
   process.env.NODE_ENV === "test"
     ? new DataSource({
         type: "sqlite",
-        database: ":memory",
+        database: ":memory:",
         entities: ["src/entities/**/*.ts"],
         synchronize: true,
       })

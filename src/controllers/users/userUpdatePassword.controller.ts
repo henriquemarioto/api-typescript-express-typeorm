@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import AppError from "../../errors/AppError";
 import userUpdatePasswordService from "../../services/users/userUpdatePassword.service";
 
 const userUpdatePasswordController = async (req: Request, res: Response) => {
@@ -6,7 +7,7 @@ const userUpdatePasswordController = async (req: Request, res: Response) => {
   const { password } = req.body;
 
   if (!password) {
-    throw new Error("No pasword informed.");
+    throw new AppError(404, "No pasword informed.");
   }
 
   const user = await userUpdatePasswordService(email, password);

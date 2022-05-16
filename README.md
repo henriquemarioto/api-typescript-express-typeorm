@@ -1,241 +1,269 @@
+# Api Express com Typescript e TypeORM
+Api com CRUD de usuário, login, carrinho, produtos e compra.
 
-# api-express-borarachar
-Api em express do capstone DivideComigo m3
+Endpoint da api: **http://localhost:3000**
 
-Endpoint: https://api-express-dividecomigo.herokuapp.com/
+### Como utilizar
+O banco roda em **docker**, lembre-se que ele ira utilizar a porta **5432**, rodamos o seguinte comando no terminal:
+```js
+docker-compose up -d
+```
+
+Logo em seguira instale as **dependencias** com
+```js
+yarn
+```
+
+Crie um arquivo **.env** na raiz do projeto e use o **.env.example** para preenche-lo com base nas informções o **docker-compose.yml**
+```js
+POSTGRES_USER=marioto
+POSTGRES_PWD=docker
+POSTGRES_DB=defaultdb
+JWT_SECRET="secretKey"
+```
+
+Rode as **migrations** rodando o comando
+```js
+yarn typeorm migration:run -d src/data-source.ts
+```
+
+Rode a **aplicação** usando
+```js
+yarn dev
+```
 
 # Users
- **Todas** as rotas users **necessitam** de um ***token***!
+
+**POST /users**
+Cadastra um novo usuário
+
+**Body**
+```json
+{
+	"name": "Marioto",
+	"email": "email@email.com",
+	"password": "12345678"
+}
+```
+**Resposta**
+```js
+{
+	"id": "1ef7f3b6-fd4a-450f-9d00-b9f849f462d1",
+	"name": "Marioto",
+	"email": "email@email.com",
+	"password": "$2b$10$JbsQ8XaARIxFaSWmtUKLQOUj18LGz6cczPFekipR82MoSNLxNbc6W",
+	"cart": {
+		"id": "67f77895-84ab-43db-8559-cc8b49bd8c4d",
+		"subtotal": 0
+	}
+}
+```
+<hr />
+
+**POST /users/login**
+Rota para fazer login, retorna um **token**
+
+**Body**
+```json
+{
+	"email": "email@email.com",
+	"password": "12345678"
+}
+```
+**Resposta**
+```js
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVtYWlsQGVtYWlsLmNvbSIsImlhdCI6MTY1MjczODkxOSwiZXhwIjoxNjUyODI1MzE5fQ.hd3aSPC8wJzmGr2zx-ccxo6_VQ9Jwh7mFPcyhghySRg"
+```
+<hr />
 
 **GET /users**
-Retorna um *array* com todos os usuário
+Retorna um *array* com todos os usuário, essa rota precisa de um token
+**Headers**
+```js
+{
+	"Authorization": "token"
+}
+```
+**Resposta**
 ```json
 [
 	{
-		"_id": "623684c1e839661d4f83e076",
-		"email": "prof@gayle.com",
-		"name": "prof. gayle",
-		"bio": "",
-		"gender": "f",
-		"phone": 21235497184,
-		"avatar_url": "https://i.postimg.cc/L8W28BPy/female-avatar.png",
-		"contacts": [],
-		"searching_for": [],
-		"already_member": [],
-		"created_at": "Sat Mar 19 2022 23:17:24 GMT+0000 (Coordinated Universal Time)",
-		"updated_at": null,
-		"__v": 0
-	},
-	{
-		"_id": "623684c1e839661d4f83e026",
-		"email": "salma@felicita.com",
-		"name": "salma felicita",
-		"bio": "",
-		"gender": "m",
-		"phone": 81066971343,
-		"avatar_url": "https://i.postimg.cc/jS2RTkDw/male-avatar.png",
-		"contacts": [],
-		"searching_for": [
-			{
-				"_id": "6234dac22c602cca71b86d1c",
-				"image": "https://i.postimg.cc/HsnrbsyL/Apple-Music.jpg"
-			},
-			{
-				"_id": "6234daaa2c602cca71b86d19",
-				"image": "https://i.postimg.cc/7ZTbQsX8/TIDAL.jpg"
-			}
-		],
-		"already_member": [],
-		"created_at": "Sat Mar 19 2022 23:17:24 GMT+0000 (Coordinated Universal Time)",
-		"updated_at": "Sun Mar 20 2022 01:34:59 GMT+0000 (Coordinated Universal Time)",
-		"__v": 0
-	},
-	//...
+		"id": "1ef7f3b6-fd4a-450f-9d00-b9f849f462d1",
+		"name": "Marioto",
+		"email": "email@email.com",
+		"password": "$2b$10$JbsQ8XaARIxFaSWmtUKLQOUj18LGz6cczPFekipR82MoSNLxNbc6W",
+		"buys": [],
+		"cart": {
+			"id": "67f77895-84ab-43db-8559-cc8b49bd8c4d",
+			"subtotal": 0,
+			"products": []
+		}
+	}
+]
 ```
+<hr />
 
-**GET /users/:id**
+**GET /users/me**
+Retorna um ***objeto*** com **todas as informações** do user do token passado
 
-Retorna um ***objeto*** com **todas as informações** do user do id passado
+**Headers**
+```js
+{
+	"Authorization": "token"
+}
+```
+**Resposta**
 ```json
 {
-	"_id": "623684c1e839661d4f83e030",
-	"email": "leatha@lindsay.com",
-	"name": "leatha lindsay",
-	"bio": "",
-	"gender": "f",
-	"phone": 94428511670,
-	"avatar_url": "https://i.postimg.cc/L8W28BPy/female-avatar.png",
-	"contacts": [],
-	"searching_for": [
-		{
-			"_id": "6234dcbe2c602cca71b86d3f",
-			"image": "https://i.postimg.cc/PqsNGWFL/Xbox-Game-Pass.jpg"
-		},
-		{
-			"_id": "6234dc482c602cca71b86d31",
-			"image": "https://i.postimg.cc/5tLYj7Fq/Amazon-Prime-Video.jpg"
-		}
-	],
-	"already_member": [],
-	"created_at": "Sat Mar 19 2022 23:17:24 GMT+0000 (Coordinated Universal Time)",
-	"updated_at": "Sun Mar 20 2022 01:34:59 GMT+0000 (Coordinated Universal Time)",
-	"__v": 0
+	"id": "1ef7f3b6-fd4a-450f-9d00-b9f849f462d1",
+	"name": "Marioto",
+	"email": "email@email.com",
+	"password": "$2b$10$JbsQ8XaARIxFaSWmtUKLQOUj18LGz6cczPFekipR82MoSNLxNbc6W",
+	"buys": [],
+	"cart": {
+		"id": "67f77895-84ab-43db-8559-cc8b49bd8c4d",
+		"subtotal": 0,
+		"products": []
+	}
 }
 ```
 <hr>
 
-**Patch /users/:id**
+**PATCH/users/me/updatepassword**
+Atualiza o password do user do token
 
- - O **token fornecido** deve ser do **id do usuário** que se esta
-   tentando dar patch.
- - **Sem retorno**.
- 
-**Nenhum dos campos é obrigatório**, atualiza apenas as seguintes informações:
-```json
-{ 
-	name: "String", 
-	bio: "String", 
-	contacts: , //Ainda em produção 
-	searching_for: ["streamingId"], 
-	notification, //Ainda em produção
-}
-```
-
-**Patch /users/:id/recovery/password**
-
-- O **token fornecido** deve ser do **id do usuário** que se esta tentando dar patch.
-
-Muda a ***senha do usuário*** caso os campos fornecidos (exceto newPassword) **estejam corretos**
+**Headers**
 ```json
 {
-	"email": "email@email.com",
-	"phone": 12345678912,
-	"cpf": 12345678978,
-	"newPassword": "123456"
+	"Authorization": "token"
+}
+```
+**Body**
+```json
+{ 
+	"password": "a2s54z6x87"
 }
 ```
 
-**Delete /users/:id**
+**Resposta**
+```json
+{
+	"message": "Password updated"
+}
+```
+<hr />
 
-- O **token fornecido** deve ser do **id do usuário** que se esta tentando dar patch.
-- **Sem retorno**
+**DELETE /users/me**
 
-**Deleta** o usuário.
+**Deleta** o usuário do token.
 
-# Groups
- **Todas** as rotas groups **necessitam** de um ***token***!
+**Headers**
+```json
+{
+	"Authorization": "token"
+}
+```
+**Resposta**
+```json
+{
+	"message": "User deleted with success!"
+}
+```
 
-**GET /users**
-Retorna um *array* com todos os grupos
+# Products
+**POST /products**
+Cadastra um novo produto
+
+**Body**
+```json
+{
+	"name": "mouse",
+	"description": "um mouse",
+	"price": 200.232
+}
+```
+**Resposta**
+```json
+{
+	"id": "c5d8dc75-f386-4c04-bffe-7266c8467ed8",
+	"name": "mouse",
+	"description": "um mouse",
+	"price": 200.23
+}
+```
+
+<hr />
+
+**GET /products**
+Retorna um array com todos os produtos
 ```json
 [
 	{
-		"_id": "623684c1e839661d4f83e076",
-		"email": "prof@gayle.com",
-		"name": "prof. gayle",
-		"bio": "",
-		"gender": "f",
-		"phone": 21235497184,
-		"avatar_url": "https://i.postimg.cc/L8W28BPy/female-avatar.png",
-		"contacts": [],
-		"searching_for": [],
-		"already_member": [],
-		"created_at": "Sat Mar 19 2022 23:17:24 GMT+0000 (Coordinated Universal Time)",
-		"updated_at": null,
-		"__v": 0
-	},
-	{
-		"_id": "623684c1e839661d4f83e026",
-		"email": "salma@felicita.com",
-		"name": "salma felicita",
-		"bio": "",
-		"gender": "m",
-		"phone": 81066971343,
-		"avatar_url": "https://i.postimg.cc/jS2RTkDw/male-avatar.png",
-		"contacts": [],
-		"searching_for": [
-			{
-				"_id": "6234dac22c602cca71b86d1c",
-				"image": "https://i.postimg.cc/HsnrbsyL/Apple-Music.jpg"
-			},
-			{
-				"_id": "6234daaa2c602cca71b86d19",
-				"image": "https://i.postimg.cc/7ZTbQsX8/TIDAL.jpg"
-			}
-		],
-		"already_member": [],
-		"created_at": "Sat Mar 19 2022 23:17:24 GMT+0000 (Coordinated Universal Time)",
-		"updated_at": "Sun Mar 20 2022 01:34:59 GMT+0000 (Coordinated Universal Time)",
-		"__v": 0
-	},
-	//...
+		"id": "c5d8dc75-f386-4c04-bffe-7266c8467ed8",
+		"name": "mouse",
+		"description": "um mouse",
+		"price": 200.23
+	}
+]
 ```
 
-**GET /users/:id**
+# Cart 
 
-Retorna um ***objeto*** com **todas as informações** do user do id passado
+**POST /cart**
+Cadastra produtos no carrinho do usuario no token
+
+**Body**
 ```json
 {
-	"_id": "623684c1e839661d4f83e030",
-	"email": "leatha@lindsay.com",
-	"name": "leatha lindsay",
-	"bio": "",
-	"gender": "f",
-	"phone": 94428511670,
-	"avatar_url": "https://i.postimg.cc/L8W28BPy/female-avatar.png",
-	"contacts": [],
-	"searching_for": [
+	"product_id": "ad9afe02-8d37-40e4-96a8-e2d60597b978"
+}
+```
+**Resposta**
+```json
+{
+	"id": "da0f6202-0365-4a30-8a5c-efad7b905d90",
+	"subtotal": 200.23,
+	"products": [
 		{
-			"_id": "6234dcbe2c602cca71b86d3f",
-			"image": "https://i.postimg.cc/PqsNGWFL/Xbox-Game-Pass.jpg"
-		},
-		{
-			"_id": "6234dc482c602cca71b86d31",
-			"image": "https://i.postimg.cc/5tLYj7Fq/Amazon-Prime-Video.jpg"
+			"id": "c5d8dc75-f386-4c04-bffe-7266c8467ed8",
+			"name": "mouse",
+			"description": "um mouse",
+			"price": 200.23
 		}
-	],
-	"already_member": [],
-	"created_at": "Sat Mar 19 2022 23:17:24 GMT+0000 (Coordinated Universal Time)",
-	"updated_at": "Sun Mar 20 2022 01:34:59 GMT+0000 (Coordinated Universal Time)",
-	"__v": 0
+	]
 }
 ```
-<hr>
+<hr />
 
-**Patch /users/:id**
+**DELETE /cart/:product_id**
+Deleta  um produto no carrinho pelo id
 
- - O **token fornecido** deve ser do **id do usuário** que se esta
-   tentando dar patch.
- - **Sem retorno**.
- 
-**Nenhum dos campos é obrigatório**, atualiza apenas as seguintes informações:
-```json
-{ 
-	name: "String", 
-	bio: "String", 
-	contacts: , //Ainda em produção 
-	searching_for: ["streamingId"], 
-	notification, //Ainda em produção
-}
-```
+*Não retorna nada*
 
-**Patch /users/:id/recovery/password**
+# Buy
+**POST /buy**
+Finaliza a compra no carrinho do usuario do token
 
-- O **token fornecido** deve ser do **id do usuário** que se esta tentando dar patch.
-
-Muda a ***senha do usuário*** caso os campos fornecidos (exceto newPassword) **estejam corretos**
+**Headers**
 ```json
 {
-	"email": "email@email.com",
-	"phone": 12345678912,
-	"cpf": 12345678978,
-	"newPassword": "123456"
+	"Authorization": "token"
 }
 ```
-
-**Delete /users/:id**
-
-- O **token fornecido** deve ser do **id do usuário** que se esta tentando dar patch.
-- **Sem retorno**
-
-**Deleta** o usuário.
+**Resposta**
+```json
+[
+	{
+		"id": "143084d1-27a1-47c6-93fe-ac413d7a2d49",
+		"total": 200.23,
+		"products": [
+			{
+				"id": "c5d8dc75-f386-4c04-bffe-7266c8467ed8",
+				"name": "mouse",
+				"description": "um mouse",
+				"price": 200.23
+			}
+		]
+	}
+]
+```

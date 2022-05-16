@@ -9,7 +9,7 @@ O banco roda em **docker**, lembre-se que ele ira utilizar a porta **5432**, rod
 docker-compose up -d
 ```
 
-Logo em seguira instale as **dependencias** com
+Logo em seguida instale as **dependencias** com
 ```js
 yarn
 ```
